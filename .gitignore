@@ -1,0 +1,27 @@
+# dependencies & build output
+node_modules/
+dist/
+*.log
+
+# macOS
+.DS_Store
+
+# personal lead data — apna asli data kabhi commit mat karo.
+# sirf sample_leads.json repo me jaata hai.
+/data/*
+!/data/sample_leads.json
+
+# WhatsApp session / login (kabhi commit nahi — private hai)
+wa-session/
+**/wa-session/
+.wwebjs_cache/
+.wwebjs_auth/
+
+# editor / tooling
+.claude/
+.vscode/
+.idea/
+
+# temp
+/tmp/
+*.tmp

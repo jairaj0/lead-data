@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Sunrise Hotel",
+    "phone": "098765 43210",
+    "category": "Hotel",
+    "company": "Sunrise Hospitality Pvt Ltd",
+    "location": "Main Road, Sample City, 800001",
+    "website": "https://example.com",
+    "map_url": "https://www.google.com/maps/place/...",
+    "rating": 4.5,
+    "reviews_count": 210
+  },
+  {
+    "name": "Adv. Sample Sharma",
+    "phone": "099887 76655",
+    "category": "Advocate",
+    "company": "Sharma & Associates",
+    "location": "Court Road, Sample City, 800002",
+    "rating": 4.2,
+    "reviews_count": 38
+  },
+  {
+    "name": "Green Leaf Store",
+    "phone": "097000 11223",
+    "category": "Shop",
+    "location": "Market Lane, Sample City, 800003",
+    "website": "",
+    "rating": 4.8,
+    "reviews_count": 540
+  },
+  {
+    "name": "Dr. Sample Verma",
+    "phone": "098111 22334",
+    "category": "Dentist",
+    "company": "Smile Dental Clinic",
+    "location": "Hospital Road, Sample City, 800004",
+    "website": "https://example-clinic.com",
+    "rating": 4.9,
+    "reviews_count": 126
+  }
+]

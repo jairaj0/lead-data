@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lead Data</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#fff; --ink:#1f2430; --muted:#6b7280; --line:#e5e7eb;
+    --brand:#4f46e5; --brand-d:#4338ca; --green:#16a34a; --amber:#d97706;
+    --radius:12px; --shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  a{color:var(--brand);text-decoration:none}
+  header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);padding:12px 18px}
+  .toprow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .logo{font-weight:700;font-size:18px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+  .logo span{color:var(--brand)}
+  .logo img{width:26px;height:26px;border-radius:7px;display:block}
+  select,input,textarea,button{font:inherit;color:inherit}
+  select,input[type=text]{padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;outline:none}
+  input[type=text]:focus,select:focus,textarea:focus{border-color:var(--brand)}
+  .btn{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;font-weight:600}
+  .btn:hover{background:#f9fafb}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:var(--brand-d)}
+  .grow{flex:1}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--muted)}
+  .stat b{color:var(--ink)}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+  .chip{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  main{padding:16px 18px 60px;max-width:1200px;margin:0 auto}
+  .lead{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+  .lead-main{display:flex;gap:14px;align-items:flex-start;padding:14px 16px}
+  .lead-info{flex:1;min-width:0}
+  .lead-name{font-weight:700;font-size:15px}
+  .lead-sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .lead-loc{color:var(--muted);font-size:12.5px;margin-top:4px;display:flex;gap:6px;align-items:flex-start}
+  .rating{font-size:12.5px;color:var(--amber);font-weight:600;white-space:nowrap}
+  .actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  .pill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12.5px;font-weight:600;background:#fff;cursor:pointer}
+  .pill:hover{background:#f9fafb}
+  .pill.wa{color:var(--green);border-color:#bbf7d0;background:#f0fdf4}
+  .pill.wa.off{color:var(--muted);background:#fff;border-color:var(--line)}
+  .pill.call{color:var(--brand)}
+  .right{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .status-sel{border-radius:999px;border:1px solid var(--line);padding:6px 10px;font-weight:600;font-size:12.5px}
+  .chk{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none}
+  .chk input{width:16px;height:16px;accent-color:var(--green)}
+  .s-new{color:#374151}.s-contacted{color:#2563eb}.s-interested{color:#16a34a}
+  .s-follow-up{color:#d97706}.s-not-interested{color:#dc2626}.s-closed{color:#6b7280}
+  .pill.copy{color:#6b7280}
+  .quality-sel{border-radius:999px;border:1px solid var(--line);padding:6px 10px;font-weight:700;font-size:12.5px}
+  .q-best{color:#16a34a;border-color:#bbf7d0;background:#f0fdf4}
+  .q-average{color:#d97706;border-color:#fde68a;background:#fffbeb}
+  .q-bad{color:#dc2626;border-color:#fecaca;background:#fef2f2}
+  .detail{border-top:1px dashed var(--line);padding:14px 16px;display:none;background:#fcfcfd}
+  .detail.open{display:block}
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px}
+  .field textarea,.field input[type=text]{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+  .field textarea{min-height:54px;resize:vertical}
+  .row2{display:flex;gap:10px;flex-wrap:wrap}
+  .row2 .field{flex:1;min-width:180px}
+  .detail-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:6px}
+  .danger{color:#dc2626;border-color:#fecaca}
+  .danger:hover{background:#fef2f2}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px}
+  #dropzone{position:fixed;inset:0;z-index:100;background:rgba(79,70,229,.10);backdrop-filter:blur(2px);border:3px dashed var(--brand);display:none;align-items:center;justify-content:center}
+  #dropzone.show{display:flex}
+  #dropzone .box{background:#fff;border-radius:16px;padding:28px 44px;box-shadow:var(--shadow);font-weight:700;font-size:17px;color:var(--brand);pointer-events:none}
+  #dropzone .box small{display:block;color:var(--muted);font-weight:500;font-size:13px;margin-top:6px}
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:50}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  .muted{color:var(--muted)}
+  .caret{cursor:pointer;color:var(--muted);font-size:12.5px;font-weight:600;margin-top:8px;display:inline-block}
+  .modal-bg{position:fixed;inset:0;z-index:200;background:rgba(16,24,40,.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(16,24,40,.25);max-width:760px;width:100%;padding:22px 24px}
+  .modal h2{margin:0 0 4px;font-size:18px}
+  .modal .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .modal pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px 16px;overflow:auto;font-size:12.5px;line-height:1.5;max-height:300px;margin:0}
+  .modal pre .k{color:#7dd3fc}.modal pre .s{color:#86efac}.modal pre .n{color:#fca5a5}.modal pre .b{color:#fbbf24}
+  .fieldtable{width:100%;border-collapse:collapse;margin-top:14px;font-size:12.5px}
+  .fieldtable th,.fieldtable td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  .fieldtable th{color:var(--muted);font-weight:700}
+  .fieldtable code{background:var(--bg);padding:1px 6px;border-radius:6px;font-size:12px}
+  .req{color:#dc2626;font-weight:700}.opt{color:var(--muted)}
+  .modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;align-items:center}
+  .wa-status{font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+  .wa-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn.wa-running{background:var(--brand);border-color:var(--brand);color:#fff;animation:wapulse 1.4s ease-in-out infinite}
+  @keyframes wapulse{0%,100%{opacity:1}50%{opacity:.62}}
+  .wa-now{margin-top:12px;font-size:14px;font-weight:700;border:1px solid var(--brand);border-radius:9px;padding:10px 12px;background:#eef2ff;color:var(--brand-d)}
+  .wa-now .big{font-size:18px;font-variant-numeric:tabular-nums}
+  .wa-log{margin-top:12px;max-height:200px;overflow:auto;font-size:12.5px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:#fcfcfd}
+  .wa-log .ok{color:var(--green)}.wa-log .no{color:#dc2626}.wa-log .err{color:var(--amber)}.wa-log div{padding:2px 0;border-bottom:1px dashed var(--line)}
+  .pill.waver{color:var(--green);border-color:#bbf7d0;background:#f0fdf4}
+  .pill.wano{color:#dc2626;border-color:#fecaca;background:#fef2f2}
+</style>
+</head>
+<body>
+<header>
+  <div class="toprow">
+    <div class="logo"><img src="favicon.svg" alt="" />Lead<span>Data</span></div>
+    <select id="fileSel" title="Dataset (data/ folder ki JSON)"></select>
+    <button class="btn" id="reloadBtn" title="JSON dobara load karo">⟳ Reload</button>
+    <button class="btn" id="dataBtn" title="Data folder kholo (saari JSON yahin)">📁 Data</button>
+    <button class="btn" id="formatBtn" title="JSON ka format dekho aur copy karo">📋 JSON format</button>
+    <button class="btn" id="waBtn" title="WhatsApp number check (login + batch)">📲 WhatsApp check</button>
+    <div class="grow"></div>
+    <input type="text" id="search" placeholder="Search naam / category / location / phone…" style="min-width:240px" />
+    <button class="btn primary" id="addBtn">＋ Lead</button>
+  </div>
+  <div class="filters" id="statusFilters"></div>
+</header>
+
+<main>
+  <div id="list"></div>
+  <div class="empty" id="empty" style="display:none"></div>
+</main>
+
+<div id="dropzone"><div class="box">📥 JSON yahan chhodo<small>data/ folder me save ho jaayega aur khul jaayega</small></div></div>
+
+<div id="toast"></div>
+
+<div class="modal-bg" id="formatModal">
+  <div class="modal">
+    <h2>📋 JSON ka format</h2>
+    <div class="sub">Kisi bhi tarah ka lead chalega — doctor, hotel, shop, advocate, hospital, koi bhi. JSON ek <b>array</b> hona chahiye (<code>[ ... ]</code>), har lead ek object. Sirf <b>name</b> zaroori hai — baaki sab optional. Alag key naam (jaise <code>Name</code>, <code>Phone</code>, <code>mobile</code>, <code>category</code>) bhi chalenge, app khud convert kar lega.</div>
+    <pre id="formatSample"></pre>
+    <table class="fieldtable">
+      <thead><tr><th>Field</th><th>Zaroori?</th><th>Matlab</th></tr></thead>
+      <tbody id="formatFields"></tbody>
+    </table>
+    <div class="modal-foot">
+      <button class="btn" id="formatClose">Band karo</button>
+      <button class="btn primary" id="formatCopy">📋 Template copy karo</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="waModal">
+  <div class="modal">
+    <h2>📲 WhatsApp check</h2>
+    <div class="sub">Tumhare WhatsApp se number verify karta hai (asli check). Ban se bachne ke liye har check ke beech <b>15–60 sec</b> random gap, aur <b>ek baar me sirf 20</b> — phir tum dobara click karna.</div>
+
+    <div id="waConnect">
+      <div id="waStatusLine" class="wa-status">Status: <b>—</b></div>
+      <div id="waQrWrap" style="display:none;text-align:center;margin:14px 0">
+        <img id="waQr" alt="QR" style="width:240px;height:240px;border:1px solid var(--line);border-radius:10px"/>
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Phone → WhatsApp → <b>Linked devices</b> → <b>Link a device</b> → ye QR scan karo</div>
+      </div>
+    </div>
+
+    <div id="waBatch" style="display:none;margin-top:14px">
+      <div id="waScope" class="wa-status" style="margin-bottom:10px"></div>
+      <div class="wa-bar">
+        <button class="btn primary" id="waRun">▶ Check next 20</button>
+        <button class="btn danger" id="waStop" style="display:none">⏹ Stop</button>
+        <button class="btn" id="waRefresh" title="Filter badla ho to count update karo">⟳</button>
+        <span class="grow"></span>
+        <span class="muted" id="waCount"></span>
+      </div>
+      <div id="waNow" class="wa-now" style="display:none"></div>
+      <div id="waProgress" class="wa-log"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn danger" id="waLogout" style="display:none">Logout</button>
+      <span class="grow"></span>
+      <button class="btn" id="waClose">Band karo</button>
+      <button class="btn primary" id="waConnectBtn">🔌 Connect karo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STATUS_LABELS = {
+  'new':'New','contacted':'Contacted','interested':'Interested',
+  'follow-up':'Follow-up','not-interested':'Not interested','closed':'Closed'
+};
+let STATE = { file:null, statuses:[], leads:[], filterStatus:'all', search:'', waOnly:false, webFilter:'all', qualityFilter:'all', openId:null };
+
+const QUALITY_LABELS = { best:'🟢 Best', average:'🟡 Average', bad:'🔴 Bad' };
+
+// clipboard helper (file:// me bhi chalta hai, fallback ke saath)
+async function copyText(text, msg){
+  text = String(text==null?'':text).trim();
+  if(!text){ toast('Copy karne ko kuch nahi'); return; }
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta=document.createElement('textarea'); ta.value=text;
+    ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+    ta.select(); try{document.execCommand('copy');}catch(_){} ta.remove();
+  }
+  toast(msg||'Copied ✓');
+}
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1600);
+}
+
+async function api(method, url, body){
+  const u=new URL(url,'http://x');
+  return await window.leadAPI.request({method, path:u.pathname, file:u.searchParams.get('file'), body});
+}
+
+async function loadFiles(){
+  const {files}=await api('GET','/api/files');
+  const sel=$('#fileSel'); sel.innerHTML='';
+  if(!files.length){ sel.innerHTML='<option>(data/ me koi JSON nahi)</option>'; STATE.leads=[]; render(); return; }
+  files.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o);});
+  STATE.file = STATE.file && files.includes(STATE.file) ? STATE.file : files[0];
+  sel.value=STATE.file;
+  await loadLeads();
+}
+
+async function loadLeads(){
+  if(!STATE.file) return;
+  const data=await api('GET','/api/leads?file='+encodeURIComponent(STATE.file));
+  STATE.statuses=data.statuses; STATE.leads=data.leads;
+  render();
+}
+
+async function saveLead(id, patch){
+  try{
+    const {lead}=await api('PUT','/api/leads/'+encodeURIComponent(id)+'?file='+encodeURIComponent(STATE.file),patch);
+    const i=STATE.leads.findIndex(l=>String(l.id)===String(id));
+    if(i>-1) STATE.leads[i]=lead;
+    toast('Saved ✓'); return lead;
+  }catch(e){ toast('Save fail: '+e.message); }
+}
+
+async function addLead(){
+  const name=prompt('Naya lead — naam?'); if(!name) return;
+  const phone=prompt('Phone? (optional)')||'';
+  const {lead}=await api('POST','/api/leads?file='+encodeURIComponent(STATE.file),{name,phone});
+  STATE.leads.push(lead); STATE.openId=lead.id; render();
+  document.getElementById('lead-'+lead.id)?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+async function delLead(id){
+  if(!confirm('Ye lead delete karein?')) return;
+  await api('DELETE','/api/leads/'+encodeURIComponent(id)+'?file='+encodeURIComponent(STATE.file));
+  STATE.leads=STATE.leads.filter(l=>String(l.id)!==String(id));
+  toast('Deleted'); render();
+}
+
+function filtered(){
+  const q=STATE.search.trim().toLowerCase();
+  return STATE.leads.filter(l=>{
+    if(STATE.filterStatus!=='all' && l.status!==STATE.filterStatus) return false;
+    if(STATE.waOnly && !l.whatsapp) return false;
+    if(STATE.webFilter==='yes' && !l.website) return false;
+    if(STATE.webFilter==='no' && l.website) return false;
+    if(STATE.qualityFilter!=='all' && (l.quality||'')!==STATE.qualityFilter) return false;
+    if(q){
+      const hay=[l.name,l.full_name,l.specialty,l.location,l.phone].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderStats(){ /* stats ab filter chips pe hi dikhte hain (Total = All chip) — duplicate hata diya */ }
+
+function renderFilters(){
+  const wrap=$('#statusFilters');
+  const counts={}; STATE.leads.forEach(l=>counts[l.status]=(counts[l.status]||0)+1);
+  let html=`<span class="chip ${STATE.filterStatus==='all'?'active':''}" data-st="all">All (${STATE.leads.length})</span>`;
+  STATE.statuses.forEach(s=>{
+    html+=`<span class="chip ${STATE.filterStatus===s?'active':''}" data-st="${s}">${STATUS_LABELS[s]||s} ${counts[s]?'('+counts[s]+')':''}</span>`;
+  });
+  const webYes=STATE.leads.filter(l=>l.website).length;
+  const webNo=STATE.leads.length-webYes;
+  html+=`<span style="flex:1"></span>`;
+  html+=`<span class="chip ${STATE.webFilter==='yes'?'active':''}" data-web="yes">🌐 Website hai (${webYes})</span>`;
+  html+=`<span class="chip ${STATE.webFilter==='no'?'active':''}" data-web="no">🚫 Website nahi (${webNo})</span>`;
+  Object.keys(QUALITY_LABELS).forEach(q=>{
+    const n=STATE.leads.filter(l=>(l.quality||'')===q).length;
+    html+=`<span class="chip ${STATE.qualityFilter===q?'active':''}" data-q="${q}">${QUALITY_LABELS[q]}${n?' ('+n+')':''}</span>`;
+  });
+  const waCount=STATE.leads.filter(l=>l.whatsapp).length;
+  html+=`<span class="chip ${STATE.waOnly?'active':''}" data-wa="1">🟢 WhatsApp only (${waCount})</span>`;
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('[data-st]').forEach(c=>c.onclick=()=>{STATE.filterStatus=c.dataset.st;render();});
+  wrap.querySelector('[data-wa]').onclick=()=>{STATE.waOnly=!STATE.waOnly;render();};
+  wrap.querySelectorAll('[data-web]').forEach(c=>c.onclick=()=>{STATE.webFilter=STATE.webFilter===c.dataset.web?'all':c.dataset.web;render();});
+  wrap.querySelectorAll('[data-q]').forEach(c=>c.onclick=()=>{STATE.qualityFilter=STATE.qualityFilter===c.dataset.q?'all':c.dataset.q;render();});
+}
+
+function statusSelect(l){
+  return `<select class="status-sel s-${l.status}" data-act="status" data-id="${l.id}">`+
+    STATE.statuses.map(s=>`<option value="${s}" ${s===l.status?'selected':''}>${STATUS_LABELS[s]||s}</option>`).join('')+
+    `</select>`;
+}
+
+function leadCard(l){
+  const wa=l.whatsapp;
+  const waLink = l.phone_intl ? `https://wa.me/${l.phone_intl}` : '';
+  const open = STATE.openId===l.id;
+  return `<div class="lead" id="lead-${l.id}">
+    <div class="lead-main">
+      <div class="lead-info">
+        <div class="lead-name">${esc(l.name)||'<span class="muted">(no name)</span>'}</div>
+        <div class="lead-sub">${esc(l.specialty)||''}${l.clinic_name?' · '+esc(l.clinic_name):''}</div>
+        ${l.location?`<div class="lead-loc">📍 <span>${esc(l.location)}</span></div>`:''}
+        <div class="actions">
+          ${l.phone?`<a class="pill call" href="tel:${esc(l.phone.replace(/\s/g,''))}">📞 ${esc(l.phone)}</a>`:''}
+          ${l.phone?`<span class="pill copy" data-act="copy-phone" data-id="${l.id}" title="Sirf phone number copy">📋 Phone</span>`:''}
+          ${(l.phone||l.name)?`<span class="pill copy" data-act="copy-both" data-id="${l.id}" title="Naam + phone dono copy (WhatsApp ke liye)">📋 Naam+Phone</span>`:''}
+          ${l.wa_checked
+            ? (wa ? `<a class="pill waver" href="${waLink||'#'}" ${waLink?'target="_blank"':''} title="Verified — WhatsApp hai">✓ WhatsApp</a>`
+                  : `<span class="pill wano" title="Check kiya — WhatsApp nahi">✗ No WhatsApp</span>`)
+            : (wa&&waLink ? `<a class="pill wa" href="${waLink}" target="_blank" title="Sirf guess (number format). WhatsApp check se verify karo">🟢 WhatsApp?</a>`
+                  : `<span class="pill wa off" title="Guess: WhatsApp nahi. WhatsApp check se verify karo">⚪ No WA?</span>`)}
+          ${l.map_url?`<a class="pill" href="${esc(l.map_url)}" target="_blank">📍 Map</a>`:''}
+          ${l.website?`<a class="pill" href="${esc(l.website)}" target="_blank">🌐 Site</a>`:''}
+        </div>
+        <span class="caret" data-act="toggle" data-id="${l.id}">${open?'▲ band karo':'▾ checklist / notes'}</span>
+      </div>
+      <div class="right">
+        ${l.rating!=null?`<div class="rating">⭐ ${esc(l.rating)}${l.reviews_count!=null?` <span class="muted">(${l.reviews_count})</span>`:''}</div>`:''}
+        ${statusSelect(l)}
+        <select class="quality-sel q-${l.quality||''}" data-act="quality" data-id="${l.id}" title="Website / lead quality">
+          <option value="">⚪ mark karo</option>
+          <option value="best" ${l.quality==='best'?'selected':''}>🟢 Best</option>
+          <option value="average" ${l.quality==='average'?'selected':''}>🟡 Average</option>
+          <option value="bad" ${l.quality==='bad'?'selected':''}>🔴 Bad</option>
+        </select>
+        <label class="chk"><input type="checkbox" data-act="contacted" data-id="${l.id}" ${l.contacted?'checked':''}/> Contacted</label>
+      </div>
+    </div>
+    <div class="detail ${open?'open':''}" id="detail-${l.id}">
+      <div class="field">
+        <label>Response — usne kya bola?</label>
+        <textarea data-fld="response" data-id="${l.id}" placeholder="Call/WhatsApp pe kya response mila…">${esc(l.response)}</textarea>
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea data-fld="notes" data-id="${l.id}" placeholder="Koi bhi extra note…">${esc(l.notes)}</textarea>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Follow-up date / reminder</label>
+          <input type="text" data-fld="follow_up" data-id="${l.id}" value="${esc(l.follow_up)}" placeholder="jaise: 28 June, ya 'kal call'"/>
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="text" data-fld="phone" data-id="${l.id}" value="${esc(l.phone)}" />
+        </div>
+      </div>
+      <div class="detail-actions">
+        <label class="chk"><input type="checkbox" data-act="wa-toggle" data-id="${l.id}" ${wa?'checked':''}/> WhatsApp hai</label>
+        <span class="grow"></span>
+        <button class="btn danger" data-act="delete" data-id="${l.id}">Delete</button>
+        <button class="btn primary" data-act="save-detail" data-id="${l.id}">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  renderStats(); renderFilters();
+  const rows=filtered();
+  const list=$('#list'), empty=$('#empty');
+  if(!STATE.leads.length){
+    list.innerHTML=''; empty.style.display='block';
+    empty.innerHTML = STATE.file ? 'Is dataset me koi lead nahi. <br>“＋ Lead” se add karo.' :
+      'Koi dataset nahi mila.<br>Apni JSON <code>lead-data/data/</code> folder me daalo, phir ⟳ Reload.';
+    return;
+  }
+  empty.style.display = rows.length? 'none':'block';
+  if(!rows.length) empty.textContent='Filter se kuch match nahi hua.';
+  list.innerHTML=rows.map(leadCard).join('');
+  bindRows();
+}
+
+function getLead(id){return STATE.leads.find(l=>String(l.id)===String(id));}
+
+function bindRows(){
+  document.querySelectorAll('[data-act="status"]').forEach(el=>el.onchange=()=>{
+    saveLead(el.dataset.id,{status:el.value}); const l=getLead(el.dataset.id); if(l){l.status=el.value;} el.className='status-sel s-'+el.value; renderStats(); renderFilters();
+  });
+  document.querySelectorAll('[data-act="contacted"]').forEach(el=>el.onchange=()=>{
+    const l=getLead(el.dataset.id); if(l)l.contacted=el.checked;
+    // contacted karte hi status 'new' ho to 'contacted' bana do
+    const patch={contacted:el.checked};
+    if(el.checked && l && l.status==='new'){patch.status='contacted'; l.status='contacted';}
+    saveLead(el.dataset.id,patch).then(()=>{renderStats();render();});
+  });
+  document.querySelectorAll('[data-act="toggle"]').forEach(el=>el.onclick=()=>{
+    STATE.openId = STATE.openId===el.dataset.id||STATE.openId===+el.dataset.id ? null : getLead(el.dataset.id).id;
+    render();
+  });
+  document.querySelectorAll('[data-act="quality"]').forEach(el=>el.onchange=()=>{
+    const l=getLead(el.dataset.id); if(l)l.quality=el.value; el.className='quality-sel q-'+el.value;
+    saveLead(el.dataset.id,{quality:el.value}).then(()=>renderFilters());
+  });
+  document.querySelectorAll('[data-act="copy-phone"]').forEach(el=>el.onclick=()=>{
+    const l=getLead(el.dataset.id); if(l) copyText(l.phone,'Phone copied ✓');
+  });
+  document.querySelectorAll('[data-act="copy-both"]').forEach(el=>el.onclick=()=>{
+    const l=getLead(el.dataset.id); if(!l) return;
+    const text=[l.name,l.phone].filter(Boolean).join('\n');
+    copyText(text,'Naam + phone copied ✓');
+  });
+  document.querySelectorAll('[data-act="delete"]').forEach(el=>el.onclick=()=>delLead(el.dataset.id));
+  document.querySelectorAll('[data-act="save-detail"]').forEach(el=>el.onclick=()=>{
+    const id=el.dataset.id, d=document.getElementById('detail-'+id);
+    const patch={};
+    d.querySelectorAll('[data-fld]').forEach(f=>patch[f.dataset.fld]=f.value);
+    const waBox=d.querySelector('[data-act="wa-toggle"]'); if(waBox)patch.whatsapp=waBox.checked;
+    saveLead(id,patch).then(()=>render());
+  });
+}
+
+// ---- JSON format helper (template dekho + copy karo) ----
+const FORMAT_FIELDS = [
+  ['name',         true,  'Person ya business ka naam (hotel, shop, advocate, doctor — kuch bhi). Sirf yahi zaroori hai.'],
+  ['phone',        false, 'Phone number. App khud WhatsApp + intl number bana lega.'],
+  ['category',     false, 'Kaam / type — jaise "Hotel", "Advocate", "Shop", "Dentist", "Hospital".'],
+  ['company',      false, 'Firm / business / clinic ka naam (agar person ke naam se alag ho to).'],
+  ['location',     false, 'Pura address.'],
+  ['website',      false, 'Website link. "Website hai/nahi" filter isi se chalta hai.'],
+  ['map_url',      false, 'Google Maps ka link.'],
+  ['rating',       false, 'Google rating (number), jaise 4.7.'],
+  ['reviews_count',false, 'Kitne reviews (number).'],
+  ['email',        false, 'Email (agar ho to).'],
+];
+const FORMAT_TEMPLATE = [
+  {
+    name: "Sunrise Hotel",
+    phone: "098765 43210",
+    category: "Hotel",
+    company: "Sunrise Hospitality Pvt Ltd",
+    location: "Main Road, Ranchi, Jharkhand 834001",
+    website: "https://example.com",
+    map_url: "https://www.google.com/maps/place/...",
+    rating: 4.7,
+    reviews_count: 220,
+    email: "contact@example.com"
+  }
+];
+const TEMPLATE_TEXT = JSON.stringify(FORMAT_TEMPLATE, null, 2);
+
+function hl(json){ // chhota sa JSON syntax-highlight
+  return esc(json)
+    .replace(/(&quot;[^&]*?&quot;)(\s*:)/g,'<span class="k">$1</span>$2')
+    .replace(/:\s*(&quot;.*?&quot;)/g,': <span class="s">$1</span>')
+    .replace(/:\s*(-?\d+\.?\d*)/g,': <span class="n">$1</span>')
+    .replace(/:\s*(true|false)/g,': <span class="b">$1</span>');
+}
+function openFormat(){
+  $('#formatSample').innerHTML = hl(TEMPLATE_TEXT);
+  $('#formatFields').innerHTML = FORMAT_FIELDS.map(([k,req,desc])=>
+    `<tr><td><code>${k}</code></td><td>${req?'<span class="req">Zaroori</span>':'<span class="opt">optional</span>'}</td><td>${esc(desc)}</td></tr>`
+  ).join('');
+  $('#formatModal').classList.add('show');
+}
+$('#formatBtn').onclick=openFormat;
+$('#formatClose').onclick=()=>$('#formatModal').classList.remove('show');
+$('#formatModal').onclick=e=>{ if(e.target.id==='formatModal') $('#formatModal').classList.remove('show'); };
+$('#formatCopy').onclick=()=>copyText(TEMPLATE_TEXT,'Template copied ✓ — apne JSON me paste karo');
+
+// ---- WhatsApp check ----
+let WA = { state:'disconnected', qr:null };
+let waBatch = { running:false, cancel:false, done:0, total:0, found:0, phase:'' };
+
+// header button pe live running status (background me chal raha ho to bhi dikhe)
+function waUpdateBtn(){
+  const b=$('#waBtn'); if(!b) return;
+  if(waBatch.running){
+    b.innerHTML=`⏳ WhatsApp: ${waBatch.done}/${waBatch.total} <span style="opacity:.8">(${waBatch.found}✓)</span>`;
+    b.classList.add('wa-running');
+  } else {
+    b.textContent='📲 WhatsApp check';
+    b.classList.remove('wa-running');
+  }
+}
+// sirf ek lead ka card refresh karo (poori list re-render nahi — taaki tum dusre lead pe likhte raho to mit na jaye)
+function refreshLeadCard(l){
+  const el=document.getElementById('lead-'+l.id);
+  if(el){ el.outerHTML=leadCard(l); bindRows(); }
+}
+const BATCH_CAP = 20;
+const DELAY_MIN = 15*1000, DELAY_MAX = 60*1000;
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const randDelay = () => Math.round(DELAY_MIN + Math.random()*(DELAY_MAX-DELAY_MIN));
+
+function waUpdateUI(){
+  const s=WA.state;
+  const authMsg = (WA.loading!=null) ? ('Login ho gaya, sync ho raha hai… '+WA.loading+'%') : 'Login ho gaya, ready ho raha hai… (thoda ruko)';
+  const labels={disconnected:'Connected nahi',starting:'Shuru ho raha hai…',qr:'QR scan karo',authenticated:authMsg,ready:'✅ Ready — check kar sakte ho',error:'⚠️ '+(WA.error||'Error')};
+  $('#waStatusLine').innerHTML='Status: <b>'+(labels[s]||s)+'</b>';
+  // QR
+  const qrWrap=$('#waQrWrap');
+  if(s==='qr' && WA.qr){ qrWrap.style.display='block'; $('#waQr').src=WA.qr; } else { qrWrap.style.display='none'; }
+  // buttons
+  const ready = s==='ready';
+  $('#waBatch').style.display = ready ? 'block':'none';
+  if(ready && !waBatch.running) waRefreshScope();
+  $('#waConnectBtn').style.display = (s==='disconnected'||s==='error') ? 'inline-block':'none';
+  $('#waLogout').style.display = (s==='ready'||s==='authenticated'||s==='qr'||s==='starting') ? 'inline-block':'none';
+  if(WA.chrome===false){ $('#waStatusLine').innerHTML+=' <span class="no">(Chrome install karo)</span>'; }
+}
+
+function waScopeLeads(){
+  // abhi screen pe jo dikh rahe (filter ke andar), jinme phone hai aur abhi tak check nahi hue
+  return filtered().filter(l=>l.phone_intl && !l.wa_checked);
+}
+function waFilterDesc(){
+  const p=[];
+  if(STATE.filterStatus!=='all') p.push('Status: '+(STATUS_LABELS[STATE.filterStatus]||STATE.filterStatus));
+  if(STATE.webFilter==='yes') p.push('🌐 Website hai');
+  if(STATE.webFilter==='no') p.push('🚫 Website nahi');
+  if(STATE.qualityFilter!=='all') p.push(QUALITY_LABELS[STATE.qualityFilter]||STATE.qualityFilter);
+  if(STATE.waOnly) p.push('WhatsApp only');
+  if(STATE.search.trim()) p.push('Search: "'+STATE.search.trim()+'"');
+  return p.length ? p.join(' · ') : 'Koi filter nahi (saare leads)';
+}
+function waRefreshScope(){
+  const visible=filtered();
+  const pending=visible.filter(l=>l.phone_intl && !l.wa_checked).length;
+  const alreadyChecked=visible.filter(l=>l.wa_checked).length;
+  const noPhone=visible.filter(l=>!l.phone_intl).length;
+  $('#waScope').innerHTML =
+    `<div><b>Filter:</b> ${esc(waFilterDesc())}</div>`+
+    `<div style="margin-top:4px">Is filter me <b>${pending}</b> check hone baaki`+
+    (alreadyChecked?` · <span class="ok" style="color:var(--green)">${alreadyChecked} pehle se ho chuke (skip)</span>`:'')+
+    (noPhone?` · <span class="muted">${noPhone} bina phone</span>`:'')+`</div>`+
+    `<div class="muted" style="margin-top:4px;font-size:12px">Filter badalna ho to ye window band karo, header se filter lagao, phir dobara kholo.</div>`;
+  $('#waRun').textContent = pending ? `▶ Check next ${Math.min(pending,BATCH_CAP)}` : '▶ Kuch baaki nahi';
+  $('#waRun').disabled = !pending;
+}
+function waLog(html, cls){
+  const box=$('#waProgress');
+  const d=document.createElement('div'); if(cls)d.className=cls; d.innerHTML=html;
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+
+function fmtTime(sec){ const m=Math.floor(sec/60), s=sec%60; return m+':'+String(s).padStart(2,'0'); }
+function waSetNow(html){ const n=$('#waNow'); n.style.display='block'; n.innerHTML=html; }
+
+async function waRunBatch(){
+  if(waBatch.running) return;
+  if(WA.state!=='ready'){ toast('Pehle WhatsApp connect karo'); return; }
+  const queue = waScopeLeads().slice(0, BATCH_CAP);
+  if(!queue.length){ toast('Is filter me sab check ho chuke (ya phone nahi)'); return; }
+  waBatch.running=true; waBatch.cancel=false; waBatch.done=0; waBatch.found=0; waBatch.total=queue.length;
+  $('#waRun').style.display='none'; $('#waStop').style.display='inline-block';
+  $('#waProgress').innerHTML='';
+  waUpdateBtn();
+  for(const l of queue){
+    if(waBatch.cancel){ waLog('⏹ Roka gaya.','err'); break; }
+    waSetNow(`🔍 Check kar rahe: <b>${esc(l.name)}</b> … <span class="muted">(${waBatch.done+1}/${queue.length})</span>`);
+    const r = await window.leadAPI.waCheck(l.phone_intl);
+    if(r && r.error){
+      waLog(`⚠️ ${esc(l.name)} — error: ${esc(r.error)}`,'err');
+      if(r.error==='not_ready'){ toast('WhatsApp ready nahi'); break; }
+    } else {
+      const has=!!(r&&r.registered);
+      if(has)waBatch.found++;
+      await saveLead(l.id,{whatsapp:has, wa_checked:true});
+      const li=getLead(l.id); if(li){li.whatsapp=has; li.wa_checked=true; refreshLeadCard(li);}
+      waLog(`${has?'🟢':'🔴'} ${esc(l.name)} — ${has?'WhatsApp HAI ✓':'WhatsApp nahi ✗'}`, has?'ok':'no');
+    }
+    waBatch.done++;
+    $('#waCount').textContent=`${waBatch.done}/${queue.length} done · ${waBatch.found} pe WhatsApp`;
+    waUpdateBtn();
+    if(waBatch.done<queue.length && !waBatch.cancel){
+      const ms=randDelay();
+      // live countdown — har second update
+      let waited=0;
+      while(waited<ms && !waBatch.cancel){
+        const rem=Math.ceil((ms-waited)/1000);
+        waSetNow(`⏳ Agla check <span class="big">${fmtTime(rem)}</span> me<br><span class="muted" style="font-weight:600">${waBatch.done}/${queue.length} ho gaye · ${waBatch.found} pe WhatsApp mila · safe gap chal raha hai</span>`);
+        await sleep(Math.min(1000, ms-waited)); waited+=1000;
+      }
+    }
+  }
+  const cancelled=waBatch.cancel;
+  waSetNow(`✅ <b>${cancelled?'Roka gaya':'Ho gaya'}:</b> ${waBatch.done} checked, <b>${waBatch.found}</b> pe WhatsApp mila.${(!cancelled && queue.length>=BATCH_CAP)?' <span class="muted" style="font-weight:600">Thoda break lo, phir dobara click karke agle 20.</span>':''}`);
+  waLog(`✔ ${cancelled?'Roka gaya':'Batch poora'}: ${waBatch.done} checked, ${waBatch.found} pe WhatsApp.`);
+  if(!cancelled) toast(`✅ WhatsApp check ho gaya: ${waBatch.found}/${waBatch.done} pe WhatsApp`);
+  waBatch.running=false;
+  $('#waRun').style.display='inline-block'; $('#waStop').style.display='none';
+  waUpdateBtn();
+  waRefreshScope();
+}
+
+$('#waBtn').onclick=async()=>{
+  $('#waModal').classList.add('show');
+  WA=await window.leadAPI.waStatus(); waUpdateUI();
+  // session saved ho to apne aap connect — user ko Connect dabane ki zaroorat nahi
+  if(WA.state==='disconnected'||WA.state==='error'){ WA=await window.leadAPI.waStart(); waUpdateUI(); }
+  if(WA.state==='ready') waRefreshScope();
+};
+$('#waRefresh').onclick=()=>waRefreshScope();
+$('#waClose').onclick=()=>{ $('#waModal').classList.remove('show'); if(waBatch.running) toast('Background me chal raha hai — button pe status dikhega'); };
+$('#waModal').onclick=e=>{ if(e.target.id==='waModal'){ $('#waModal').classList.remove('show'); if(waBatch.running) toast('Background me chal raha hai — button pe status dikhega'); } };
+$('#waConnectBtn').onclick=async()=>{ WA=await window.leadAPI.waStart(); waUpdateUI(); };
+$('#waLogout').onclick=async()=>{ if(waBatch.running){toast('Pehle Stop dabao');return;} WA=await window.leadAPI.waLogout(); waUpdateUI(); };
+$('#waRun').onclick=waRunBatch;
+$('#waStop').onclick=()=>{ waBatch.cancel=true; toast('Rok rahe hain…'); };
+window.leadAPI.onWaStatus(s=>{ WA=s; waUpdateUI(); });
+
+// events
+$('#fileSel').onchange=e=>{STATE.file=e.target.value;STATE.openId=null;loadLeads();};
+$('#reloadBtn').onclick=()=>loadFiles();
+$('#dataBtn').onclick=()=>window.leadAPI.openDataFolder();
+$('#addBtn').onclick=addLead;
+$('#search').oninput=e=>{STATE.search=e.target.value;render();};
+
+// ---- drag & drop import (poore page pe) ----
+let dragDepth=0;
+const dz=$('#dropzone');
+function hasFiles(e){return [...(e.dataTransfer?.types||[])].includes('Files');}
+window.addEventListener('dragenter',e=>{ if(!hasFiles(e))return; e.preventDefault(); dragDepth++; dz.classList.add('show'); });
+window.addEventListener('dragover',e=>{ if(hasFiles(e)) e.preventDefault(); });
+window.addEventListener('dragleave',e=>{ if(!hasFiles(e))return; e.preventDefault(); if(--dragDepth<=0){dragDepth=0;dz.classList.remove('show');} });
+window.addEventListener('drop',async e=>{
+  if(!hasFiles(e)) return;
+  e.preventDefault(); dragDepth=0; dz.classList.remove('show');
+  const files=[...(e.dataTransfer.files||[])].filter(f=>/\.json$/i.test(f.name));
+  if(!files.length){ toast('Sirf .json file daalo'); return; }
+  let last=null;
+  for(const f of files){
+    try{
+      const data=JSON.parse(await f.text());
+      const r=await api('POST','/api/import',{name:f.name,data});
+      last=r.file; toast(`✓ ${r.count} leads → ${r.file}`);
+    }catch(err){ toast(f.name+': '+err.message); }
+  }
+  if(last){ STATE.file=last; STATE.openId=null; await loadFiles(); $('#fileSel').value=STATE.file; }
+});
+
+loadFiles().catch(e=>{$('#empty').style.display='block';$('#empty').textContent='Error: '+e.message;});
+</script>
+</body>
+</html>
