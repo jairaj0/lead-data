@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Renderer (index.html) sirf in safe methods ko dekh sakta hai.
+// The renderer (index.html) can only see these safe methods.
 contextBridge.exposeInMainWorld('leadAPI', {
   request: (args) => ipcRenderer.invoke('api', args),
   openDataFolder: () => ipcRenderer.invoke('open-data-folder'),

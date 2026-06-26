@@ -4,16 +4,16 @@ const fs = require('fs');
 const createStore = require('./leadstore');
 const createWhatsApp = require('./whatsapp');
 
-// ---- data folder (saare JSON yahin) ----
-// EK HI folder — dev ho ya packaged app, dono yahin se padhte-likhte hain.
-// Isse data kabhi "reset" nahi dikhega (pehle dev project/data use karta tha,
-// installed app userData — do alag jagah, isliye confusion hoti thi).
-// ~/Library/Application Support/lead-data/data  (writable, app update pe bhi bacha rehta hai)
+// ---- data folder (all JSON lives here) ----
+// ONE folder — dev or packaged app, both read/write from here.
+// This way data never appears to "reset" (previously dev used project/data and the
+// installed app used userData — two different places, which caused confusion).
+// ~/Library/Application Support/lead-data/data  (writable, survives app updates)
 const DATA_DIR = path.join(app.getPath('userData'), 'data');
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
-// Seed: pehli baar (folder khaali ho to) bundled sample JSON copy kar do.
-// Maujooda file ko kabhi overwrite nahi karta — tumhare edits safe.
+// Seed: on first run (when the folder is empty) copy the bundled sample JSON.
+// Never overwrites an existing file — your edits stay safe.
 const seedDir = app.isPackaged ? path.join(process.resourcesPath, 'data') : path.join(__dirname, 'data');
 if (fs.existsSync(seedDir)) {
   for (const f of fs.readdirSync(seedDir)) {
@@ -25,7 +25,7 @@ if (fs.existsSync(seedDir)) {
 
 const store = createStore(DATA_DIR);
 
-// ---- IPC: renderer ke api() calls yahan handle hote hain ----
+// ---- IPC: the renderer's api() calls are handled here ----
 ipcMain.handle('api', async (_e, { method, path: p, file, body }) => {
   if (p === '/api/files' && method === 'GET') return { files: store.listFiles() };
   if (p === '/api/import' && method === 'POST') return store.importJSON(body.name, body.data);

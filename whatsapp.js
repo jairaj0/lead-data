@@ -1,9 +1,9 @@
 /*
  * whatsapp.js — WhatsApp number check via whatsapp-web.js (unofficial).
- * Tumhara WhatsApp ek baar QR se login hota hai (session save ho jaata hai).
- * System ka Chrome use karta hai (alag Chromium download nahi).
+ * You log in once with a QR (the session is saved afterwards).
+ * Uses the system's Chrome (no separate Chromium download).
  *
- * ⚠️ Bulk/fast check pe ban ka risk. UI me 30s–3min random delay + 20 ka cap rakha hai.
+ * ⚠️ Bulk/fast checking risks a ban. The UI enforces a 15-60s random delay + a cap of 20 per run.
  */
 const fs = require('fs');
 const path = require('path');
@@ -41,8 +41,8 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
   function clearReadyPoll() { if (readyPoll) { clearInterval(readyPoll); readyPoll = null; } }
   function markReady() { clearWatchdog(); clearReadyPoll(); loadingPct = null; retried = false; setState('ready'); }
 
-  // 'ready' event whatsapp-web.js me reliable nahi — isliye getState() poll karke
-  // khud confirm karte hain ki client usable hai (CONNECTED = Store inject ho gaya).
+  // the 'ready' event in whatsapp-web.js isn't reliable — so we poll getState()
+  // to confirm the client is usable (CONNECTED = the Store has been injected).
   function beginReadyPoll() {
     if (readyPoll || state === 'ready') return;
     let tries = 0;
@@ -50,25 +50,25 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
       tries++;
       if (state === 'ready' || !client) { clearReadyPoll(); return; }
       try {
-        const st = await client.getState();   // Store ready na ho to throw karega
+        const st = await client.getState();   // throws if the Store isn't ready yet
         if (st === 'CONNECTED') { markReady(); return; }
-      } catch (_) { /* abhi ready nahi, poll chalta rahe */ }
+      } catch (_) { /* not ready yet, keep polling */ }
       if (tries >= 25) clearReadyPoll();       // ~100s; watchdog sambhal lega
     }, 4000);
   }
 
-  // authenticated ke baad agar bahut der tak ready na ho, client restart karo (stuck-loading fix)
+  // if it doesn't get ready for a long time after authenticating, restart the client (stuck-loading fix)
   function armWatchdog(ms) {
     clearWatchdog();
     watchdog = setTimeout(async () => {
       if (state === 'ready') return;
-      if (retried) { clearReadyPoll(); lastError = 'WhatsApp ready nahi hua (sync atak gaya). Phone online hai? Dobara kholo ya Logout karke re-link karo.'; setState('error'); await destroy(); return; }
+      if (retried) { clearReadyPoll(); lastError = 'WhatsApp did not get ready (sync stuck). Is your phone online? Reopen, or Logout and re-link.'; setState('error'); await destroy(); return; }
       retried = true;
       clearReadyPoll();
       try { if (client) await client.destroy(); } catch {}
       client = null;
       setState('starting');
-      start();   // ek baar dobara
+      start();   // try once more
     }, ms);
   }
   async function destroy() {
@@ -83,7 +83,7 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
     }
     const chrome = findChrome();
     if (!chrome) {
-      lastError = 'Chrome nahi mila. Google Chrome install karo phir try karo.';
+      lastError = 'Chrome not found. Install Google Chrome, then try again.';
       setState('error');
       return getStatus();
     }
@@ -96,7 +96,7 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
       WAWeb = require('whatsapp-web.js');
       QRCode = require('qrcode');
     } catch (e) {
-      lastError = 'whatsapp-web.js load nahi hua: ' + e.message;
+      lastError = 'Failed to load whatsapp-web.js: ' + e.message;
       setState('error');
       return getStatus();
     }
@@ -105,7 +105,7 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
     fs.mkdirSync(dataPath, { recursive: true });
     client = new Client({
       authStrategy: new LocalAuth({ dataPath }),
-      takeoverOnConflict: true,      // doosri linked-device session ho to takeover karo (hang na ho)
+      takeoverOnConflict: true,      // take over if another linked-device session exists (avoid hanging)
       takeoverTimeoutMs: 10000,
       puppeteer: {
         headless: true,
@@ -123,14 +123,14 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
     client.on('loading_screen', (percent) => {
       loadingPct = Number(percent) || null;
       if (state !== 'ready') setState('authenticated');
-      beginReadyPoll();                              // sync chal raha hai → ready check shuru
+      beginReadyPoll();                              // syncing → start the readiness check
     });
     client.on('authenticated', () => { qrDataUrl = null; setState('authenticated'); armWatchdog(70000); beginReadyPoll(); });
     client.on('ready', () => markReady());
     client.on('auth_failure', (m) => { clearWatchdog(); clearReadyPoll(); lastError = 'Auth fail: ' + m; setState('error'); });
     client.on('disconnected', (r) => { clearWatchdog(); clearReadyPoll(); lastError = 'Disconnected: ' + r; client = null; setState('disconnected'); });
 
-    // session valid ho to 'authenticated' jaldi aata hai; warna QR. Agar dono na aaye, watchdog.
+    // a valid session fires 'authenticated' quickly; otherwise a QR. If neither comes, the watchdog handles it.
     armWatchdog(70000);
     client.initialize().catch((e) => {
       clearWatchdog();
@@ -147,7 +147,7 @@ module.exports = function createWhatsApp({ dataPath, emit }) {
     const num = String(numberIntl || '').replace(/\D/g, '');
     if (!num) return { error: 'no_number' };
     try {
-      const id = await client.getNumberId(num); // null = WhatsApp nahi
+      const id = await client.getNumberId(num); // null = not on WhatsApp
       return { registered: !!id };
     } catch (e) {
       return { error: e.message || 'check_failed' };

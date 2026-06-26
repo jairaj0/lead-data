@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -107,13 +107,13 @@
 <header>
   <div class="toprow">
     <div class="logo"><img src="favicon.svg" alt="" />Lead<span>Data</span></div>
-    <select id="fileSel" title="Dataset (data/ folder ki JSON)"></select>
-    <button class="btn" id="reloadBtn" title="JSON dobara load karo">⟳ Reload</button>
-    <button class="btn" id="dataBtn" title="Data folder kholo (saari JSON yahin)">📁 Data</button>
-    <button class="btn" id="formatBtn" title="JSON ka format dekho aur copy karo">📋 JSON format</button>
+    <select id="fileSel" title="Dataset (JSON files in the data/ folder)"></select>
+    <button class="btn" id="reloadBtn" title="Reload JSON">⟳ Reload</button>
+    <button class="btn" id="dataBtn" title="Open the data folder (all JSON files live here)">📁 Data</button>
+    <button class="btn" id="formatBtn" title="View and copy the JSON format">📋 JSON format</button>
     <button class="btn" id="waBtn" title="WhatsApp number check (login + batch)">📲 WhatsApp check</button>
     <div class="grow"></div>
-    <input type="text" id="search" placeholder="Search naam / category / location / phone…" style="min-width:240px" />
+    <input type="text" id="search" placeholder="Search name / category / location / phone…" style="min-width:240px" />
     <button class="btn primary" id="addBtn">＋ Lead</button>
   </div>
   <div class="filters" id="statusFilters"></div>
@@ -124,22 +124,22 @@
   <div class="empty" id="empty" style="display:none"></div>
 </main>
 
-<div id="dropzone"><div class="box">📥 JSON yahan chhodo<small>data/ folder me save ho jaayega aur khul jaayega</small></div></div>
+<div id="dropzone"><div class="box">📥 Drop JSON here<small>It will be saved to the data/ folder and opened automatically</small></div></div>
 
 <div id="toast"></div>
 
 <div class="modal-bg" id="formatModal">
   <div class="modal">
-    <h2>📋 JSON ka format</h2>
-    <div class="sub">Kisi bhi tarah ka lead chalega — doctor, hotel, shop, advocate, hospital, koi bhi. JSON ek <b>array</b> hona chahiye (<code>[ ... ]</code>), har lead ek object. Sirf <b>name</b> zaroori hai — baaki sab optional. Alag key naam (jaise <code>Name</code>, <code>Phone</code>, <code>mobile</code>, <code>category</code>) bhi chalenge, app khud convert kar lega.</div>
+    <h2>📋 JSON format</h2>
+    <div class="sub">Any kind of lead works — doctor, hotel, shop, advocate, hospital, anything. The JSON must be an <b>array</b> (<code>[ ... ]</code>), with each lead an object. Only <b>name</b> is required — everything else is optional. Alternate key names (like <code>Name</code>, <code>Phone</code>, <code>mobile</code>, <code>category</code>) also work — the app converts them automatically.</div>
     <pre id="formatSample"></pre>
     <table class="fieldtable">
-      <thead><tr><th>Field</th><th>Zaroori?</th><th>Matlab</th></tr></thead>
+      <thead><tr><th>Field</th><th>Required?</th><th>Meaning</th></tr></thead>
       <tbody id="formatFields"></tbody>
     </table>
     <div class="modal-foot">
-      <button class="btn" id="formatClose">Band karo</button>
-      <button class="btn primary" id="formatCopy">📋 Template copy karo</button>
+      <button class="btn" id="formatClose">Close</button>
+      <button class="btn primary" id="formatCopy">📋 Copy template</button>
     </div>
   </div>
 </div>
@@ -147,13 +147,13 @@
 <div class="modal-bg" id="waModal">
   <div class="modal">
     <h2>📲 WhatsApp check</h2>
-    <div class="sub">Tumhare WhatsApp se number verify karta hai (asli check). Ban se bachne ke liye har check ke beech <b>15–60 sec</b> random gap, aur <b>ek baar me sirf 20</b> — phir tum dobara click karna.</div>
+    <div class="sub">Verifies numbers using your own WhatsApp (a real check). To avoid bans there is a random <b>15–60 sec</b> gap between checks, and <b>only 20 per run</b> — then you click again for the next batch.</div>
 
     <div id="waConnect">
       <div id="waStatusLine" class="wa-status">Status: <b>—</b></div>
       <div id="waQrWrap" style="display:none;text-align:center;margin:14px 0">
         <img id="waQr" alt="QR" style="width:240px;height:240px;border:1px solid var(--line);border-radius:10px"/>
-        <div class="muted" style="font-size:12.5px;margin-top:8px">Phone → WhatsApp → <b>Linked devices</b> → <b>Link a device</b> → ye QR scan karo</div>
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Phone → WhatsApp → <b>Linked devices</b> → <b>Link a device</b> → scan this QR</div>
       </div>
     </div>
 
@@ -162,7 +162,7 @@
       <div class="wa-bar">
         <button class="btn primary" id="waRun">▶ Check next 20</button>
         <button class="btn danger" id="waStop" style="display:none">⏹ Stop</button>
-        <button class="btn" id="waRefresh" title="Filter badla ho to count update karo">⟳</button>
+        <button class="btn" id="waRefresh" title="Refresh the count if you changed the filter">⟳</button>
         <span class="grow"></span>
         <span class="muted" id="waCount"></span>
       </div>
@@ -173,8 +173,8 @@
     <div class="modal-foot">
       <button class="btn danger" id="waLogout" style="display:none">Logout</button>
       <span class="grow"></span>
-      <button class="btn" id="waClose">Band karo</button>
-      <button class="btn primary" id="waConnectBtn">🔌 Connect karo</button>
+      <button class="btn" id="waClose">Close</button>
+      <button class="btn primary" id="waConnectBtn">🔌 Connect</button>
     </div>
   </div>
 </div>
@@ -188,10 +188,10 @@ let STATE = { file:null, statuses:[], leads:[], filterStatus:'all', search:'', w
 
 const QUALITY_LABELS = { best:'🟢 Best', average:'🟡 Average', bad:'🔴 Bad' };
 
-// clipboard helper (file:// me bhi chalta hai, fallback ke saath)
+// clipboard helper (works under file:// too, with a fallback)
 async function copyText(text, msg){
   text = String(text==null?'':text).trim();
-  if(!text){ toast('Copy karne ko kuch nahi'); return; }
+  if(!text){ toast('Nothing to copy'); return; }
   try{
     await navigator.clipboard.writeText(text);
   }catch(e){
@@ -218,7 +218,7 @@ async function api(method, url, body){
 async function loadFiles(){
   const {files}=await api('GET','/api/files');
   const sel=$('#fileSel'); sel.innerHTML='';
-  if(!files.length){ sel.innerHTML='<option>(data/ me koi JSON nahi)</option>'; STATE.leads=[]; render(); return; }
+  if(!files.length){ sel.innerHTML='<option>(no JSON in data/)</option>'; STATE.leads=[]; render(); return; }
   files.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o);});
   STATE.file = STATE.file && files.includes(STATE.file) ? STATE.file : files[0];
   sel.value=STATE.file;
@@ -238,11 +238,11 @@ async function saveLead(id, patch){
     const i=STATE.leads.findIndex(l=>String(l.id)===String(id));
     if(i>-1) STATE.leads[i]=lead;
     toast('Saved ✓'); return lead;
-  }catch(e){ toast('Save fail: '+e.message); }
+  }catch(e){ toast('Save failed: '+e.message); }
 }
 
 async function addLead(){
-  const name=prompt('Naya lead — naam?'); if(!name) return;
+  const name=prompt('New lead — name?'); if(!name) return;
   const phone=prompt('Phone? (optional)')||'';
   const {lead}=await api('POST','/api/leads?file='+encodeURIComponent(STATE.file),{name,phone});
   STATE.leads.push(lead); STATE.openId=lead.id; render();
@@ -250,7 +250,7 @@ async function addLead(){
 }
 
 async function delLead(id){
-  if(!confirm('Ye lead delete karein?')) return;
+  if(!confirm('Delete this lead?')) return;
   await api('DELETE','/api/leads/'+encodeURIComponent(id)+'?file='+encodeURIComponent(STATE.file));
   STATE.leads=STATE.leads.filter(l=>String(l.id)!==String(id));
   toast('Deleted'); render();
@@ -272,7 +272,7 @@ function filtered(){
   });
 }
 
-function renderStats(){ /* stats ab filter chips pe hi dikhte hain (Total = All chip) — duplicate hata diya */ }
+function renderStats(){ /* stats now live on the filter chips (Total = the "All" chip) — duplicate removed */ }
 
 function renderFilters(){
   const wrap=$('#statusFilters');
@@ -284,8 +284,8 @@ function renderFilters(){
   const webYes=STATE.leads.filter(l=>l.website).length;
   const webNo=STATE.leads.length-webYes;
   html+=`<span style="flex:1"></span>`;
-  html+=`<span class="chip ${STATE.webFilter==='yes'?'active':''}" data-web="yes">🌐 Website hai (${webYes})</span>`;
-  html+=`<span class="chip ${STATE.webFilter==='no'?'active':''}" data-web="no">🚫 Website nahi (${webNo})</span>`;
+  html+=`<span class="chip ${STATE.webFilter==='yes'?'active':''}" data-web="yes">🌐 Has website (${webYes})</span>`;
+  html+=`<span class="chip ${STATE.webFilter==='no'?'active':''}" data-web="no">🚫 No website (${webNo})</span>`;
   Object.keys(QUALITY_LABELS).forEach(q=>{
     const n=STATE.leads.filter(l=>(l.quality||'')===q).length;
     html+=`<span class="chip ${STATE.qualityFilter===q?'active':''}" data-q="${q}">${QUALITY_LABELS[q]}${n?' ('+n+')':''}</span>`;
@@ -317,23 +317,23 @@ function leadCard(l){
         ${l.location?`<div class="lead-loc">📍 <span>${esc(l.location)}</span></div>`:''}
         <div class="actions">
           ${l.phone?`<a class="pill call" href="tel:${esc(l.phone.replace(/\s/g,''))}">📞 ${esc(l.phone)}</a>`:''}
-          ${l.phone?`<span class="pill copy" data-act="copy-phone" data-id="${l.id}" title="Sirf phone number copy">📋 Phone</span>`:''}
-          ${(l.phone||l.name)?`<span class="pill copy" data-act="copy-both" data-id="${l.id}" title="Naam + phone dono copy (WhatsApp ke liye)">📋 Naam+Phone</span>`:''}
+          ${l.phone?`<span class="pill copy" data-act="copy-phone" data-id="${l.id}" title="Copy phone number only">📋 Phone</span>`:''}
+          ${(l.phone||l.name)?`<span class="pill copy" data-act="copy-both" data-id="${l.id}" title="Copy name + phone (for WhatsApp)">📋 Name+Phone</span>`:''}
           ${l.wa_checked
-            ? (wa ? `<a class="pill waver" href="${waLink||'#'}" ${waLink?'target="_blank"':''} title="Verified — WhatsApp hai">✓ WhatsApp</a>`
-                  : `<span class="pill wano" title="Check kiya — WhatsApp nahi">✗ No WhatsApp</span>`)
-            : (wa&&waLink ? `<a class="pill wa" href="${waLink}" target="_blank" title="Sirf guess (number format). WhatsApp check se verify karo">🟢 WhatsApp?</a>`
-                  : `<span class="pill wa off" title="Guess: WhatsApp nahi. WhatsApp check se verify karo">⚪ No WA?</span>`)}
+            ? (wa ? `<a class="pill waver" href="${waLink||'#'}" ${waLink?'target="_blank"':''} title="Verified — has WhatsApp">✓ WhatsApp</a>`
+                  : `<span class="pill wano" title="Checked — no WhatsApp">✗ No WhatsApp</span>`)
+            : (wa&&waLink ? `<a class="pill wa" href="${waLink}" target="_blank" title="Just a guess (from number format). Verify with WhatsApp check">🟢 WhatsApp?</a>`
+                  : `<span class="pill wa off" title="Guess: no WhatsApp. Verify with WhatsApp check">⚪ No WA?</span>`)}
           ${l.map_url?`<a class="pill" href="${esc(l.map_url)}" target="_blank">📍 Map</a>`:''}
           ${l.website?`<a class="pill" href="${esc(l.website)}" target="_blank">🌐 Site</a>`:''}
         </div>
-        <span class="caret" data-act="toggle" data-id="${l.id}">${open?'▲ band karo':'▾ checklist / notes'}</span>
+        <span class="caret" data-act="toggle" data-id="${l.id}">${open?'▲ collapse':'▾ checklist / notes'}</span>
       </div>
       <div class="right">
         ${l.rating!=null?`<div class="rating">⭐ ${esc(l.rating)}${l.reviews_count!=null?` <span class="muted">(${l.reviews_count})</span>`:''}</div>`:''}
         ${statusSelect(l)}
         <select class="quality-sel q-${l.quality||''}" data-act="quality" data-id="${l.id}" title="Website / lead quality">
-          <option value="">⚪ mark karo</option>
+          <option value="">⚪ mark</option>
           <option value="best" ${l.quality==='best'?'selected':''}>🟢 Best</option>
           <option value="average" ${l.quality==='average'?'selected':''}>🟡 Average</option>
           <option value="bad" ${l.quality==='bad'?'selected':''}>🔴 Bad</option>
@@ -343,17 +343,17 @@ function leadCard(l){
     </div>
     <div class="detail ${open?'open':''}" id="detail-${l.id}">
       <div class="field">
-        <label>Response — usne kya bola?</label>
-        <textarea data-fld="response" data-id="${l.id}" placeholder="Call/WhatsApp pe kya response mila…">${esc(l.response)}</textarea>
+        <label>Response — what did they say?</label>
+        <textarea data-fld="response" data-id="${l.id}" placeholder="What response did you get on the call / WhatsApp…">${esc(l.response)}</textarea>
       </div>
       <div class="field">
         <label>Notes</label>
-        <textarea data-fld="notes" data-id="${l.id}" placeholder="Koi bhi extra note…">${esc(l.notes)}</textarea>
+        <textarea data-fld="notes" data-id="${l.id}" placeholder="Any extra note…">${esc(l.notes)}</textarea>
       </div>
       <div class="row2">
         <div class="field">
           <label>Follow-up date / reminder</label>
-          <input type="text" data-fld="follow_up" data-id="${l.id}" value="${esc(l.follow_up)}" placeholder="jaise: 28 June, ya 'kal call'"/>
+          <input type="text" data-fld="follow_up" data-id="${l.id}" value="${esc(l.follow_up)}" placeholder="e.g. 28 June, or 'call tomorrow'"/>
         </div>
         <div class="field">
           <label>Phone</label>
@@ -361,7 +361,7 @@ function leadCard(l){
         </div>
       </div>
       <div class="detail-actions">
-        <label class="chk"><input type="checkbox" data-act="wa-toggle" data-id="${l.id}" ${wa?'checked':''}/> WhatsApp hai</label>
+        <label class="chk"><input type="checkbox" data-act="wa-toggle" data-id="${l.id}" ${wa?'checked':''}/> Has WhatsApp</label>
         <span class="grow"></span>
         <button class="btn danger" data-act="delete" data-id="${l.id}">Delete</button>
         <button class="btn primary" data-act="save-detail" data-id="${l.id}">Save</button>
@@ -376,12 +376,12 @@ function render(){
   const list=$('#list'), empty=$('#empty');
   if(!STATE.leads.length){
     list.innerHTML=''; empty.style.display='block';
-    empty.innerHTML = STATE.file ? 'Is dataset me koi lead nahi. <br>“＋ Lead” se add karo.' :
-      'Koi dataset nahi mila.<br>Apni JSON <code>lead-data/data/</code> folder me daalo, phir ⟳ Reload.';
+    empty.innerHTML = STATE.file ? 'No leads in this dataset. <br>Add one with “＋ Lead”.' :
+      'No dataset found.<br>Put your JSON in the <code>data/</code> folder, then ⟳ Reload.';
     return;
   }
   empty.style.display = rows.length? 'none':'block';
-  if(!rows.length) empty.textContent='Filter se kuch match nahi hua.';
+  if(!rows.length) empty.textContent='Nothing matches the filter.';
   list.innerHTML=rows.map(leadCard).join('');
   bindRows();
 }
@@ -394,7 +394,7 @@ function bindRows(){
   });
   document.querySelectorAll('[data-act="contacted"]').forEach(el=>el.onchange=()=>{
     const l=getLead(el.dataset.id); if(l)l.contacted=el.checked;
-    // contacted karte hi status 'new' ho to 'contacted' bana do
+    // when marked contacted, bump status 'new' -> 'contacted'
     const patch={contacted:el.checked};
     if(el.checked && l && l.status==='new'){patch.status='contacted'; l.status='contacted';}
     saveLead(el.dataset.id,patch).then(()=>{renderStats();render();});
@@ -413,7 +413,7 @@ function bindRows(){
   document.querySelectorAll('[data-act="copy-both"]').forEach(el=>el.onclick=()=>{
     const l=getLead(el.dataset.id); if(!l) return;
     const text=[l.name,l.phone].filter(Boolean).join('\n');
-    copyText(text,'Naam + phone copied ✓');
+    copyText(text,'Name + phone copied ✓');
   });
   document.querySelectorAll('[data-act="delete"]').forEach(el=>el.onclick=()=>delLead(el.dataset.id));
   document.querySelectorAll('[data-act="save-detail"]').forEach(el=>el.onclick=()=>{
@@ -425,18 +425,18 @@ function bindRows(){
   });
 }
 
-// ---- JSON format helper (template dekho + copy karo) ----
+// ---- JSON format helper (view template + copy) ----
 const FORMAT_FIELDS = [
-  ['name',         true,  'Person ya business ka naam (hotel, shop, advocate, doctor — kuch bhi). Sirf yahi zaroori hai.'],
-  ['phone',        false, 'Phone number. App khud WhatsApp + intl number bana lega.'],
-  ['category',     false, 'Kaam / type — jaise "Hotel", "Advocate", "Shop", "Dentist", "Hospital".'],
-  ['company',      false, 'Firm / business / clinic ka naam (agar person ke naam se alag ho to).'],
-  ['location',     false, 'Pura address.'],
-  ['website',      false, 'Website link. "Website hai/nahi" filter isi se chalta hai.'],
-  ['map_url',      false, 'Google Maps ka link.'],
-  ['rating',       false, 'Google rating (number), jaise 4.7.'],
-  ['reviews_count',false, 'Kitne reviews (number).'],
-  ['email',        false, 'Email (agar ho to).'],
+  ['name',         true,  'Person or business name (hotel, shop, advocate, doctor — anything). The only required field.'],
+  ['phone',        false, 'Phone number. The app builds the WhatsApp + international number automatically.'],
+  ['category',     false, 'Type of work — e.g. "Hotel", "Advocate", "Shop", "Dentist", "Hospital".'],
+  ['company',      false, 'Firm / business / clinic name (if different from the person name).'],
+  ['location',     false, 'Full address.'],
+  ['website',      false, 'Website link. The "Has website / No website" filter uses this.'],
+  ['map_url',      false, 'Google Maps link.'],
+  ['rating',       false, 'Google rating (number), e.g. 4.7.'],
+  ['reviews_count',false, 'Number of reviews (number).'],
+  ['email',        false, 'Email (if available).'],
 ];
 const FORMAT_TEMPLATE = [
   {
@@ -444,7 +444,7 @@ const FORMAT_TEMPLATE = [
     phone: "098765 43210",
     category: "Hotel",
     company: "Sunrise Hospitality Pvt Ltd",
-    location: "Main Road, Ranchi, Jharkhand 834001",
+    location: "Main Road, Sample City, 800001",
     website: "https://example.com",
     map_url: "https://www.google.com/maps/place/...",
     rating: 4.7,
@@ -454,7 +454,7 @@ const FORMAT_TEMPLATE = [
 ];
 const TEMPLATE_TEXT = JSON.stringify(FORMAT_TEMPLATE, null, 2);
 
-function hl(json){ // chhota sa JSON syntax-highlight
+function hl(json){ // tiny JSON syntax highlighter
   return esc(json)
     .replace(/(&quot;[^&]*?&quot;)(\s*:)/g,'<span class="k">$1</span>$2')
     .replace(/:\s*(&quot;.*?&quot;)/g,': <span class="s">$1</span>')
@@ -464,20 +464,20 @@ function hl(json){ // chhota sa JSON syntax-highlight
 function openFormat(){
   $('#formatSample').innerHTML = hl(TEMPLATE_TEXT);
   $('#formatFields').innerHTML = FORMAT_FIELDS.map(([k,req,desc])=>
-    `<tr><td><code>${k}</code></td><td>${req?'<span class="req">Zaroori</span>':'<span class="opt">optional</span>'}</td><td>${esc(desc)}</td></tr>`
+    `<tr><td><code>${k}</code></td><td>${req?'<span class="req">Required</span>':'<span class="opt">optional</span>'}</td><td>${esc(desc)}</td></tr>`
   ).join('');
   $('#formatModal').classList.add('show');
 }
 $('#formatBtn').onclick=openFormat;
 $('#formatClose').onclick=()=>$('#formatModal').classList.remove('show');
 $('#formatModal').onclick=e=>{ if(e.target.id==='formatModal') $('#formatModal').classList.remove('show'); };
-$('#formatCopy').onclick=()=>copyText(TEMPLATE_TEXT,'Template copied ✓ — apne JSON me paste karo');
+$('#formatCopy').onclick=()=>copyText(TEMPLATE_TEXT,'Template copied ✓ — paste it into your JSON');
 
 // ---- WhatsApp check ----
 let WA = { state:'disconnected', qr:null };
 let waBatch = { running:false, cancel:false, done:0, total:0, found:0, phase:'' };
 
-// header button pe live running status (background me chal raha ho to bhi dikhe)
+// live running status on the header button (visible even when running in the background)
 function waUpdateBtn(){
   const b=$('#waBtn'); if(!b) return;
   if(waBatch.running){
@@ -488,7 +488,7 @@ function waUpdateBtn(){
     b.classList.remove('wa-running');
   }
 }
-// sirf ek lead ka card refresh karo (poori list re-render nahi — taaki tum dusre lead pe likhte raho to mit na jaye)
+// refresh only one lead's card (not the whole list — so editing another lead isn't wiped)
 function refreshLeadCard(l){
   const el=document.getElementById('lead-'+l.id);
   if(el){ el.outerHTML=leadCard(l); bindRows(); }
@@ -500,8 +500,8 @@ const randDelay = () => Math.round(DELAY_MIN + Math.random()*(DELAY_MAX-DELAY_MI
 
 function waUpdateUI(){
   const s=WA.state;
-  const authMsg = (WA.loading!=null) ? ('Login ho gaya, sync ho raha hai… '+WA.loading+'%') : 'Login ho gaya, ready ho raha hai… (thoda ruko)';
-  const labels={disconnected:'Connected nahi',starting:'Shuru ho raha hai…',qr:'QR scan karo',authenticated:authMsg,ready:'✅ Ready — check kar sakte ho',error:'⚠️ '+(WA.error||'Error')};
+  const authMsg = (WA.loading!=null) ? ('Logged in, syncing… '+WA.loading+'%') : 'Logged in, getting ready… (please wait)';
+  const labels={disconnected:'Not connected',starting:'Starting…',qr:'Scan the QR',authenticated:authMsg,ready:'✅ Ready — you can run checks',error:'⚠️ '+(WA.error||'Error')};
   $('#waStatusLine').innerHTML='Status: <b>'+(labels[s]||s)+'</b>';
   // QR
   const qrWrap=$('#waQrWrap');
@@ -512,22 +512,22 @@ function waUpdateUI(){
   if(ready && !waBatch.running) waRefreshScope();
   $('#waConnectBtn').style.display = (s==='disconnected'||s==='error') ? 'inline-block':'none';
   $('#waLogout').style.display = (s==='ready'||s==='authenticated'||s==='qr'||s==='starting') ? 'inline-block':'none';
-  if(WA.chrome===false){ $('#waStatusLine').innerHTML+=' <span class="no">(Chrome install karo)</span>'; }
+  if(WA.chrome===false){ $('#waStatusLine').innerHTML+=' <span class="no">(install Chrome)</span>'; }
 }
 
 function waScopeLeads(){
-  // abhi screen pe jo dikh rahe (filter ke andar), jinme phone hai aur abhi tak check nahi hue
+  // currently visible leads (inside the filter) that have a phone and haven't been checked yet
   return filtered().filter(l=>l.phone_intl && !l.wa_checked);
 }
 function waFilterDesc(){
   const p=[];
   if(STATE.filterStatus!=='all') p.push('Status: '+(STATUS_LABELS[STATE.filterStatus]||STATE.filterStatus));
-  if(STATE.webFilter==='yes') p.push('🌐 Website hai');
-  if(STATE.webFilter==='no') p.push('🚫 Website nahi');
+  if(STATE.webFilter==='yes') p.push('🌐 Has website');
+  if(STATE.webFilter==='no') p.push('🚫 No website');
   if(STATE.qualityFilter!=='all') p.push(QUALITY_LABELS[STATE.qualityFilter]||STATE.qualityFilter);
   if(STATE.waOnly) p.push('WhatsApp only');
   if(STATE.search.trim()) p.push('Search: "'+STATE.search.trim()+'"');
-  return p.length ? p.join(' · ') : 'Koi filter nahi (saare leads)';
+  return p.length ? p.join(' · ') : 'No filter (all leads)';
 }
 function waRefreshScope(){
   const visible=filtered();
@@ -536,11 +536,11 @@ function waRefreshScope(){
   const noPhone=visible.filter(l=>!l.phone_intl).length;
   $('#waScope').innerHTML =
     `<div><b>Filter:</b> ${esc(waFilterDesc())}</div>`+
-    `<div style="margin-top:4px">Is filter me <b>${pending}</b> check hone baaki`+
-    (alreadyChecked?` · <span class="ok" style="color:var(--green)">${alreadyChecked} pehle se ho chuke (skip)</span>`:'')+
-    (noPhone?` · <span class="muted">${noPhone} bina phone</span>`:'')+`</div>`+
-    `<div class="muted" style="margin-top:4px;font-size:12px">Filter badalna ho to ye window band karo, header se filter lagao, phir dobara kholo.</div>`;
-  $('#waRun').textContent = pending ? `▶ Check next ${Math.min(pending,BATCH_CAP)}` : '▶ Kuch baaki nahi';
+    `<div style="margin-top:4px"><b>${pending}</b> left to check in this filter`+
+    (alreadyChecked?` · <span class="ok" style="color:var(--green)">${alreadyChecked} already done (skipped)</span>`:'')+
+    (noPhone?` · <span class="muted">${noPhone} without phone</span>`:'')+`</div>`+
+    `<div class="muted" style="margin-top:4px;font-size:12px">To change the filter, close this window, set it in the header, then reopen.</div>`;
+  $('#waRun').textContent = pending ? `▶ Check next ${Math.min(pending,BATCH_CAP)}` : '▶ Nothing left';
   $('#waRun').disabled = !pending;
 }
 function waLog(html, cls){
@@ -554,45 +554,45 @@ function waSetNow(html){ const n=$('#waNow'); n.style.display='block'; n.innerHT
 
 async function waRunBatch(){
   if(waBatch.running) return;
-  if(WA.state!=='ready'){ toast('Pehle WhatsApp connect karo'); return; }
+  if(WA.state!=='ready'){ toast('Connect WhatsApp first'); return; }
   const queue = waScopeLeads().slice(0, BATCH_CAP);
-  if(!queue.length){ toast('Is filter me sab check ho chuke (ya phone nahi)'); return; }
+  if(!queue.length){ toast('All checked in this filter (or no phone)'); return; }
   waBatch.running=true; waBatch.cancel=false; waBatch.done=0; waBatch.found=0; waBatch.total=queue.length;
   $('#waRun').style.display='none'; $('#waStop').style.display='inline-block';
   $('#waProgress').innerHTML='';
   waUpdateBtn();
   for(const l of queue){
-    if(waBatch.cancel){ waLog('⏹ Roka gaya.','err'); break; }
-    waSetNow(`🔍 Check kar rahe: <b>${esc(l.name)}</b> … <span class="muted">(${waBatch.done+1}/${queue.length})</span>`);
+    if(waBatch.cancel){ waLog('⏹ Stopped.','err'); break; }
+    waSetNow(`🔍 Checking: <b>${esc(l.name)}</b> … <span class="muted">(${waBatch.done+1}/${queue.length})</span>`);
     const r = await window.leadAPI.waCheck(l.phone_intl);
     if(r && r.error){
       waLog(`⚠️ ${esc(l.name)} — error: ${esc(r.error)}`,'err');
-      if(r.error==='not_ready'){ toast('WhatsApp ready nahi'); break; }
+      if(r.error==='not_ready'){ toast('WhatsApp not ready'); break; }
     } else {
       const has=!!(r&&r.registered);
       if(has)waBatch.found++;
       await saveLead(l.id,{whatsapp:has, wa_checked:true});
       const li=getLead(l.id); if(li){li.whatsapp=has; li.wa_checked=true; refreshLeadCard(li);}
-      waLog(`${has?'🟢':'🔴'} ${esc(l.name)} — ${has?'WhatsApp HAI ✓':'WhatsApp nahi ✗'}`, has?'ok':'no');
+      waLog(`${has?'🟢':'🔴'} ${esc(l.name)} — ${has?'Has WhatsApp ✓':'No WhatsApp ✗'}`, has?'ok':'no');
     }
     waBatch.done++;
-    $('#waCount').textContent=`${waBatch.done}/${queue.length} done · ${waBatch.found} pe WhatsApp`;
+    $('#waCount').textContent=`${waBatch.done}/${queue.length} done · ${waBatch.found} on WhatsApp`;
     waUpdateBtn();
     if(waBatch.done<queue.length && !waBatch.cancel){
       const ms=randDelay();
-      // live countdown — har second update
+      // live countdown — update every second
       let waited=0;
       while(waited<ms && !waBatch.cancel){
         const rem=Math.ceil((ms-waited)/1000);
-        waSetNow(`⏳ Agla check <span class="big">${fmtTime(rem)}</span> me<br><span class="muted" style="font-weight:600">${waBatch.done}/${queue.length} ho gaye · ${waBatch.found} pe WhatsApp mila · safe gap chal raha hai</span>`);
+        waSetNow(`⏳ Next check in <span class="big">${fmtTime(rem)}</span><br><span class="muted" style="font-weight:600">${waBatch.done}/${queue.length} done · ${waBatch.found} on WhatsApp · safe gap running</span>`);
         await sleep(Math.min(1000, ms-waited)); waited+=1000;
       }
     }
   }
   const cancelled=waBatch.cancel;
-  waSetNow(`✅ <b>${cancelled?'Roka gaya':'Ho gaya'}:</b> ${waBatch.done} checked, <b>${waBatch.found}</b> pe WhatsApp mila.${(!cancelled && queue.length>=BATCH_CAP)?' <span class="muted" style="font-weight:600">Thoda break lo, phir dobara click karke agle 20.</span>':''}`);
-  waLog(`✔ ${cancelled?'Roka gaya':'Batch poora'}: ${waBatch.done} checked, ${waBatch.found} pe WhatsApp.`);
-  if(!cancelled) toast(`✅ WhatsApp check ho gaya: ${waBatch.found}/${waBatch.done} pe WhatsApp`);
+  waSetNow(`✅ <b>${cancelled?'Stopped':'Done'}:</b> ${waBatch.done} checked, <b>${waBatch.found}</b> on WhatsApp.${(!cancelled && queue.length>=BATCH_CAP)?' <span class="muted" style="font-weight:600">Take a short break, then click again for the next 20.</span>':''}`);
+  waLog(`✔ ${cancelled?'Stopped':'Batch complete'}: ${waBatch.done} checked, ${waBatch.found} on WhatsApp.`);
+  if(!cancelled) toast(`✅ WhatsApp check done: ${waBatch.found}/${waBatch.done} on WhatsApp`);
   waBatch.running=false;
   $('#waRun').style.display='inline-block'; $('#waStop').style.display='none';
   waUpdateBtn();
@@ -602,17 +602,17 @@ async function waRunBatch(){
 $('#waBtn').onclick=async()=>{
   $('#waModal').classList.add('show');
   WA=await window.leadAPI.waStatus(); waUpdateUI();
-  // session saved ho to apne aap connect — user ko Connect dabane ki zaroorat nahi
+  // if a session is saved, connect automatically — no need to press Connect
   if(WA.state==='disconnected'||WA.state==='error'){ WA=await window.leadAPI.waStart(); waUpdateUI(); }
   if(WA.state==='ready') waRefreshScope();
 };
 $('#waRefresh').onclick=()=>waRefreshScope();
-$('#waClose').onclick=()=>{ $('#waModal').classList.remove('show'); if(waBatch.running) toast('Background me chal raha hai — button pe status dikhega'); };
-$('#waModal').onclick=e=>{ if(e.target.id==='waModal'){ $('#waModal').classList.remove('show'); if(waBatch.running) toast('Background me chal raha hai — button pe status dikhega'); } };
+$('#waClose').onclick=()=>{ $('#waModal').classList.remove('show'); if(waBatch.running) toast('Running in the background — progress shows on the button'); };
+$('#waModal').onclick=e=>{ if(e.target.id==='waModal'){ $('#waModal').classList.remove('show'); if(waBatch.running) toast('Running in the background — progress shows on the button'); } };
 $('#waConnectBtn').onclick=async()=>{ WA=await window.leadAPI.waStart(); waUpdateUI(); };
-$('#waLogout').onclick=async()=>{ if(waBatch.running){toast('Pehle Stop dabao');return;} WA=await window.leadAPI.waLogout(); waUpdateUI(); };
+$('#waLogout').onclick=async()=>{ if(waBatch.running){toast('Press Stop first');return;} WA=await window.leadAPI.waLogout(); waUpdateUI(); };
 $('#waRun').onclick=waRunBatch;
-$('#waStop').onclick=()=>{ waBatch.cancel=true; toast('Rok rahe hain…'); };
+$('#waStop').onclick=()=>{ waBatch.cancel=true; toast('Stopping…'); };
 window.leadAPI.onWaStatus(s=>{ WA=s; waUpdateUI(); });
 
 // events
@@ -622,7 +622,7 @@ $('#dataBtn').onclick=()=>window.leadAPI.openDataFolder();
 $('#addBtn').onclick=addLead;
 $('#search').oninput=e=>{STATE.search=e.target.value;render();};
 
-// ---- drag & drop import (poore page pe) ----
+// ---- drag & drop import (anywhere on the page) ----
 let dragDepth=0;
 const dz=$('#dropzone');
 function hasFiles(e){return [...(e.dataTransfer?.types||[])].includes('Files');}
@@ -633,7 +633,7 @@ window.addEventListener('drop',async e=>{
   if(!hasFiles(e)) return;
   e.preventDefault(); dragDepth=0; dz.classList.remove('show');
   const files=[...(e.dataTransfer.files||[])].filter(f=>/\.json$/i.test(f.name));
-  if(!files.length){ toast('Sirf .json file daalo'); return; }
+  if(!files.length){ toast('Only .json files allowed'); return; }
   let last=null;
   for(const f of files){
     try{

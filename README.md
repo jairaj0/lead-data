@@ -2,19 +2,17 @@
 
 A simple, **local** lead manager for macOS (Electron). Your **database is just JSON files** in a `data/` folder — no CSV, no cloud, no login, no internet needed. Built for anyone doing outreach: doctors, hotels, shops, advocates, hospitals — any kind of lead.
 
-> Hindi: Ek **local Mac app** leads manage karne ke liye. Database = JSON files. Koi internet/login nahi. Doctor, hotel, shop, advocate — kisi bhi tarah ke lead ke liye.
-
 ---
 
 ## ✨ Features
 
-- 📋 **JSON in, JSON out** — drag & drop any `.json` to import. Smart import: alag key naam (`Name`, `Phone`, `mobile`, `category`, `Google Maps`…) khud samajh leta hai.
-- 🔎 **Search & filters** — status, **website hai / nahi**, quality, WhatsApp.
-- ⭐ **Quality marking** — har lead ko 🟢 Best / 🟡 Average / 🔴 Bad mark karo.
-- 📞 **One-click copy** — sirf phone, ya **naam + phone** (WhatsApp pe bhejne ke liye).
-- 📲 **WhatsApp check (optional)** — number pe WhatsApp hai ya nahi, real check (see ⚠️ disclaimer below).
-- 📝 Status, contacted, notes, response, follow-up — sab ek jagah.
-- 🔒 **100% local** — data tumhare computer pe rehta hai, kahin bahar nahi jaata.
+- 📋 **JSON in, JSON out** — drag & drop any `.json` to import. Smart import recognises alternate key names (`Name`, `Phone`, `mobile`, `category`, `Google Maps`…) automatically.
+- 🔎 **Search & filters** — by status, **has website / no website**, quality, and WhatsApp.
+- ⭐ **Quality marking** — mark each lead 🟢 Best / 🟡 Average / 🔴 Bad.
+- 📞 **One-click copy** — phone only, or **name + phone** (ready to paste into WhatsApp).
+- 📲 **WhatsApp check (optional)** — verify whether a number is on WhatsApp (see the ⚠️ disclaimer below).
+- 📝 Status, contacted, notes, response, follow-up — all in one place.
+- 🔒 **100% local** — your data stays on your computer and never leaves it.
 
 ---
 
@@ -30,7 +28,7 @@ Open it → drag **Lead Data** to Applications → launch.
 
 ### Option B — From source (developers)
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/jairaj0/lead-data.git
 cd lead-data
 npm install
 npm start
@@ -46,13 +44,13 @@ npm run dist      # creates dist/Lead Data-<version>-arm64.dmg
 ## 📖 How to use
 
 1. **Add leads:** click **＋ Lead**, or **drag & drop a `.json`** file onto the window.
-2. **Filter:** use the chips — status, 🌐 Website hai / 🚫 Website nahi, quality, WhatsApp.
+2. **Filter:** use the chips — status, 🌐 Has website / 🚫 No website, quality, WhatsApp.
 3. **Mark quality:** each lead has a Best / Average / Bad dropdown.
-4. **Copy for WhatsApp:** 📋 Phone or 📋 Naam+Phone buttons.
+4. **Copy for WhatsApp:** the 📋 Phone or 📋 Name+Phone buttons.
 5. **WhatsApp check (optional):** see below.
 
 ### JSON format
-JSON must be an **array** `[ {…}, {…} ]`. Only `name` is required — everything else optional.
+The JSON must be an **array** `[ {…}, {…} ]`. Only `name` is required — everything else is optional.
 The app also accepts alternate key names (case/space-insensitive), e.g. `Name`, `Phone Number`, `mobile`, `category`, `Google Maps`, `Stars`, `Reviews`.
 
 ```json
@@ -80,7 +78,7 @@ The optional WhatsApp feature uses **[whatsapp-web.js](https://github.com/pedros
 
 - ❗ **It is against WhatsApp's Terms of Service.** Checking many numbers quickly can get your **WhatsApp number banned**.
 - The app deliberately slows it down: a **random 15–60 sec gap** between checks and a **hard cap of 20 per run** — then you start the next batch manually.
-- **Strongly recommended:** use a **spare/secondary number**, go slow, small batches.
+- **Strongly recommended:** use a **spare/secondary number**, go slow, keep batches small.
 - This is provided for educational/personal use. **You are responsible** for how you use it. The authors take no responsibility for bans or misuse.
 
 To use it: open **📲 WhatsApp check** → scan the QR with your phone (WhatsApp → Linked devices) → **Check next 20**. The check runs in the background — you can close the popup and keep working; progress shows on the button.
@@ -93,7 +91,7 @@ To use it: open **📲 WhatsApp check** → scan the QR with your phone (WhatsAp
   (seeded once from this repo's `data/` folder on first run).
 - WhatsApp session (if used): `~/Library/Application Support/lead-data/wa-session/` — never leaves your machine.
 
-The **📁 Data** button in the app opens this folder in Finder. Each `.json` file in it = one dataset (shown in the app's dropdown). Any change you make saves straight back to that JSON.
+The **📁 Data** button in the app opens this folder in Finder. Each `.json` file in it is one dataset (shown in the app's dropdown). Any change you make saves straight back to that JSON.
 
 > The `data/` folder in this repo only contains `sample_leads.json` (dummy data). Your real leads stay on your computer and are **not** part of the repo.
 
@@ -102,13 +100,13 @@ The **📁 Data** button in the app opens this folder in Finder. Each `.json` fi
 ## 🗂 Project structure
 ```
 lead-data/
-├── main.js          # Electron main process + data folder logic
-├── preload.js       # safe bridge (renderer <-> main)
-├── leadstore.js     # JSON read/write (database layer) + smart key mapping
-├── whatsapp.js      # optional WhatsApp check (whatsapp-web.js)
-├── public/index.html# the whole UI
-├── build/           # app icons
-└── data/            # sample dataset (your real data lives in userData, see above)
+├── main.js           # Electron main process + data folder logic
+├── preload.js        # safe bridge (renderer <-> main)
+├── leadstore.js      # JSON read/write (database layer) + smart key mapping
+├── whatsapp.js       # optional WhatsApp check (whatsapp-web.js)
+├── public/index.html # the whole UI
+├── build/            # app icons
+└── data/             # sample dataset (your real data lives in userData, see above)
 ```
 
 ## 🛠 Tech

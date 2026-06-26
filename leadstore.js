@@ -1,6 +1,6 @@
 /*
- * leadstore — saara JSON read/write logic. Database = ek folder ki .json files.
- * Koi CSV nahi. main.js isko DATA_DIR de kar use karta hai.
+ * leadstore — all JSON read/write logic. Database = .json files in one folder.
+ * No CSV. main.js uses this by passing it a DATA_DIR.
  */
 const fs = require('fs');
 const path = require('path');
@@ -21,8 +21,8 @@ function phoneIntl(phone) {
   return d.length === 10 ? '91' + d : d;
 }
 
-// alag-alag JSON me key naam alag ho sakte hain — inhe canonical naam pe map karo.
-// matching: lowercase + sirf letters/numbers (space, _, - sab hata ke).
+// different JSON files may use different key names — map them to canonical names.
+// matching: lowercase + only letters/numbers (strip spaces, _, -).
 const KEY_ALIASES = {
   name: ['name', 'doctorname', 'doctor', 'title', 'businessname', 'business', 'leadname'],
   phone: ['phone', 'phonenumber', 'mobile', 'mobileno', 'mobilenumber', 'contact', 'contactnumber', 'number', 'tel', 'telephone', 'whatsappnumber', 'phoneno'],
@@ -47,7 +47,7 @@ function remapKeys(raw) {
   const out = {};
   for (const [k, v] of Object.entries(raw)) {
     const canon = CANON[slimKey(k)];
-    // canonical naam pehle aaye to use rakho; warna jo mila wahi (overwrite mat karo)
+    // prefer a canonical name if present; otherwise keep what we found (don't overwrite)
     if (canon) { if (out[canon] === undefined || out[canon] === '' || out[canon] === null) out[canon] = v; }
     else if (out[k] === undefined) out[k] = v;
   }
@@ -101,7 +101,7 @@ module.exports = function createStore(DATA_DIR) {
     let n = path.basename(String(name || 'imported'));
     if (!n.toLowerCase().endsWith('.json')) n += '.json';
     const arr = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.leads) ? raw.leads : null);
-    if (!arr) throw new Error('JSON ek array hona chahiye (ya {leads:[...]})');
+    if (!arr) throw new Error('JSON must be an array (or { "leads": [...] })');
     const leads = arr.map(normalizeLead);
     let finalName = n;
     if (fs.existsSync(path.join(DATA_DIR, finalName))) {
