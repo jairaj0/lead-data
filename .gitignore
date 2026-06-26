@@ -22,6 +22,9 @@ wa-session/
 .vscode/
 .idea/
 
+# Claude's local project context (private notes, not for the public repo)
+CLAUDE.md
+
 # temp
 /tmp/
 *.tmp
